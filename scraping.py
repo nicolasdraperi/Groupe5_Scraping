@@ -5,12 +5,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 
-# Initialisation du navigateur UNE SEULE FOIS
-driver = webdriver.Chrome()
-driver.get("https://world.openfoodfacts.org/")
-
-def get_barcode(nom_produit):
+def get_barcode(driver, nom_produit):
     try:
+        driver.get("https://world.openfoodfacts.org/")
         search_input = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.NAME, "search_terms"))
         )
@@ -22,6 +19,7 @@ def get_barcode(nom_produit):
         time.sleep(0.5)
         search_input.send_keys(Keys.ENTER)
         time.sleep(2.5)
+
         product_list = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, "products_match_all"))
         )
@@ -38,19 +36,11 @@ def get_barcode(nom_produit):
         )
         barcode = barcode_elem.text.strip()
         name_item = name_elem.text.strip()
+
         driver.get("https://world.openfoodfacts.org/")
         return name_item, barcode
 
     except Exception as e:
-        print(f"Erreur sur '{nom_produit}' : {e}")
+        print(f"erreur sur '{nom_produit}' : {e}")
         driver.get("https://world.openfoodfacts.org/")
-        return None
-
-# boucle des produit
-user_input = input("entrez les produits à rechercher (séparés par des virgules) : ")
-produits = [p.strip() for p in user_input.split(",") if p.strip()]
-for produit in produits:
-    name, code = get_barcode(produit)
-    print(f"résultat pour '{name}' : {code}\n")
-
-driver.quit()
+        return None, None
