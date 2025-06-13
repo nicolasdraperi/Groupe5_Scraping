@@ -9,6 +9,7 @@ driver = webdriver.Chrome()
 driver.get("https://www.carrefour.fr/")
 
 try:
+    # Attendre la barre de recherche
     search_input = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.ID, "header-search-bar"))
     )
@@ -20,9 +21,23 @@ try:
     search_input.send_keys("3124480191182")
     time.sleep(0.5)
     search_input.send_keys(Keys.ENTER)
-    print("recherche lancée pour item")
-except:
-    print("barre de recherche non trouvée.")
+    print("Recherche lancée pour l'article...")
 
-input("appuie sur Entrée pour quitter...")
+    # Attendre que le bloc contenant le prix apparaisse
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "product-price__amount--main"))
+    )
+
+    # Récupérer les parties du prix
+    price_container = driver.find_element(By.CLASS_NAME, "product-price__amount--main")
+    parts = price_container.find_elements(By.CLASS_NAME, "product-price__content")
+    
+    # Fusionner les parties pour reconstituer le prix
+    full_price = ''.join([part.text.strip() for part in parts])
+    print("Prix trouvé :", full_price)
+
+except Exception as e:
+    print("Erreur :", e)
+
+input("Appuie sur Entrée pour quitter...")
 driver.quit()
