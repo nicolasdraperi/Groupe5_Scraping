@@ -42,7 +42,7 @@ def get_price_from_auchan(produit):
         driver.quit()
         return "erreur"
 
-    # Vérification des résultats
+    # check result
     try:
         WebDriverWait(driver, 3).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "img.no-result__image"))
