@@ -98,7 +98,7 @@ os.makedirs(dossier, exist_ok=True)
 now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 fichier = f"{dossier}/liste_course_{now}.csv"
 
-with open(fichier, mode="w", newline="", encoding="utf-8") as f:
+with open(fichier, mode="w", newline="", encoding="utf-8-sig") as f:
     writer = csv.writer(f)
     writer.writerow([
         "Nom",
@@ -108,7 +108,9 @@ with open(fichier, mode="w", newline="", encoding="utf-8") as f:
         "Prix/L ou Kg Carrefour",
         "Quantité",
         "Total",
-        "Recommandation"
+        "Recommandation",
+        "Total Auchan",
+        "Total Carrefour"
     ])
 
     for produit, quantite, p_auchan, pu_auchan, p_carrefour, pu_carrefour in produits_compares:
@@ -123,6 +125,8 @@ with open(fichier, mode="w", newline="", encoding="utf-8") as f:
             val_carrefour = 0.0
 
         total = min(val_auchan, val_carrefour) * quantite
+        total_auchan_produit = val_auchan * quantite
+        total_carrefour_produit = val_carrefour * quantite
 
         if val_auchan < val_carrefour:
             reco = "Auchan"
@@ -139,7 +143,17 @@ with open(fichier, mode="w", newline="", encoding="utf-8") as f:
             pu_carrefour,
             quantite,
             f"{total:.2f} €",
-            reco
+            reco,
+            f"{total_auchan_produit:.2f} €",
+            f"{total_carrefour_produit:.2f} €"
         ])
+
+    writer.writerow([])
+    writer.writerow([
+        "", "", "", "", "", "", "", "TOTAL GÉNÉRAL",
+        f"{total_auchan:.2f} €",
+        f"{total_carrefour:.2f} €"
+    ])
+
 
 print(f"\nrésumé exporté dans : {fichier}")
