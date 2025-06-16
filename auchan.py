@@ -54,8 +54,15 @@ def get_price_from_auchan(produit, nom=None):
                 )
                 first_product = list_container.find_element(By.CSS_SELECTOR, "div.product-price.bolder.text-dark-color")
                 price = first_product.text.strip()
+                try:
+                    price_per_unit_span = list_container.find_element(By.CSS_SELECTOR, "span[data-seller-type]")
+                    price_per_unit = price_per_unit_span.text.strip()
+                except:
+                    price_per_unit = "prix non trouvé"
+                price = f"{price} | {price_per_unit}"
             except:
                 price = "prix non trouvé"
+
             driver.quit()
             return price
         except:
@@ -95,6 +102,14 @@ def get_price_from_auchan(produit, nom=None):
                 )
                 first_product = list_container.find_element(By.CSS_SELECTOR, "div.product-price.bolder.text-dark-color")
                 price = first_product.text.strip()
+
+                try:
+                    price_per_unit_span = list_container.find_element(By.CSS_SELECTOR, "span[data-seller-type]")
+                    price_per_unit = price_per_unit_span.text.strip()
+                except:
+                    price_per_unit = "prix non trouvé"
+                price = f"{price} | {price_per_unit}"
+
             except:
                 price = "prix non trouvé"
     else:
@@ -102,4 +117,4 @@ def get_price_from_auchan(produit, nom=None):
     driver.quit()
     return price
 
-#print(get_price_from_auchan("5449000147417","coca 20"))
+#print(get_price_from_auchan("5449000147417","coca"))

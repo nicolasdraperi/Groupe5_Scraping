@@ -30,12 +30,37 @@ def get_price_from_carrefour(produit, nom=None):
         search_input.send_keys(Keys.ENTER)
         print(f"recherche lancée pour : {produit}")
 
-        WebDriverWait(driver, 5).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "product-price__amount--main"))
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "data-plp_produits"))
         )
-        price_container = driver.find_element(By.CLASS_NAME, "product-price__amount--main")
-        parts = price_container.find_elements(By.CLASS_NAME, "product-price__content")
-        full_price = ''.join([part.text.strip() for part in parts])
+        ul = driver.find_element(By.ID, "data-plp_produits")
+        items = ul.find_elements(By.CLASS_NAME, "product-list-grid__item")
+
+        premier_article_valide = None
+        for item in items:
+            try:
+                item.find_element(By.CLASS_NAME, "advertising-placeholder-flagship")
+                continue
+            except:
+                premier_article_valide = item
+                break
+
+        if premier_article_valide:
+            price_container = premier_article_valide.find_element(By.CLASS_NAME, "product-price__amount--main")
+            parts = price_container.find_elements(By.CLASS_NAME, "product-price__content")
+            prix = ''.join([part.text.strip() for part in parts])
+            try:
+                price_per_unit_span = premier_article_valide.find_element(
+                    By.CSS_SELECTOR,
+                    "span.product-list-card-plp-grid__per-unit-label"
+                )
+                prix_unitaire = price_per_unit_span.text.strip()
+            except:
+                prix_unitaire = "prix unitaire non trouvé"
+
+            prix = f"{prix} | {prix_unitaire}"
+        else:
+            prix = "aucun article non sponsorisé trouvé"
 
     except:
         if nom:
@@ -55,18 +80,44 @@ def get_price_from_carrefour(produit, nom=None):
                 search_input.send_keys(Keys.ENTER)
                 print(f"recherche lancée pour : {nom}")
 
-                WebDriverWait(driver, 5).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, "product-price__amount--main"))
+                WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.ID, "data-plp_produits"))
                 )
-                price_container = driver.find_element(By.CLASS_NAME, "product-price__amount--main")
-                parts = price_container.find_elements(By.CLASS_NAME, "product-price__content")
-                full_price = ''.join([part.text.strip() for part in parts])
+                ul = driver.find_element(By.ID, "data-plp_produits")
+                items = ul.find_elements(By.CLASS_NAME, "product-list-grid__item")
+
+                premier_article_valide = None
+                for item in items:
+                    try:
+                        item.find_element(By.CLASS_NAME, "advertising-placeholder-flagship")
+                        continue
+                    except:
+                        premier_article_valide = item
+                        break
+
+                if premier_article_valide:
+                    price_container = premier_article_valide.find_element(By.CLASS_NAME, "product-price__amount--main")
+                    parts = price_container.find_elements(By.CLASS_NAME, "product-price__content")
+                    prix = ''.join([part.text.strip() for part in parts])
+
+                    try:
+                        price_per_unit_span = premier_article_valide.find_element(
+                            By.CSS_SELECTOR,
+                            "span.product-list-card-plp-grid__per-unit-label"
+                        )
+                        prix_unitaire = price_per_unit_span.text.strip()
+                    except:
+                        prix_unitaire = "prix unitaire non trouvé"
+
+                    prix = f"{prix} | {prix_unitaire}"
+                else:
+                    prix = "aucun article non sponsorisé trouvé"
             except:
-                full_price = "produit non trouvé"
+                prix = "produit non trouvé"
         else:
-            full_price = "produit non trouvé"
+            prix = "produit non trouvé"
 
     driver.quit()
-    return full_price
+    return prix
 
-#print(get_price_from_carrefour("5449000147417","coca"))
+#print(get_price_from_carrefour("5449000147417", "coca"))
