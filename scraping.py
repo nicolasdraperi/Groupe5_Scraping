@@ -44,3 +44,4 @@ def get_barcode(driver, nom_produit):
         print(f"erreur sur '{nom_produit}' : {e}")
         driver.get("https://world.openfoodfacts.org/")
         return None, None
+
